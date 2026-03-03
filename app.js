@@ -1,4 +1,4 @@
-const SCRIPT_URL = 'REPLACE_WITH_YOUR_WEB_APP_URL'; // E.g., https://script.google.com/macros/s/.../exec
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzPwXGyR0aDSj1tOI6j12tnDBVjc7TjwSbrUmVrDvBBcd0niEqkoI3ENMTnfskGhgFs/exec'; // E.g., https://script.google.com/macros/s/.../exec
 
 document.addEventListener('DOMContentLoaded', () => {
     

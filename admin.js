@@ -1,4 +1,4 @@
-const SCRIPT_URL = 'REPLACE_WITH_YOUR_WEB_APP_URL'; // Must match the URL in app.js
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzPwXGyR0aDSj1tOI6j12tnDBVjc7TjwSbrUmVrDvBBcd0niEqkoI3ENMTnfskGhgFs/exec'; // Must match the URL in app.js
 
 document.addEventListener('DOMContentLoaded', () => {
     if (SCRIPT_URL === 'REPLACE_WITH_YOUR_WEB_APP_URL') {
