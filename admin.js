@@ -2,7 +2,7 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzPwXGyR0aDSj1tOI6j1
 
 document.addEventListener('DOMContentLoaded', () => {
     if (SCRIPT_URL === 'REPLACE_WITH_YOUR_WEB_APP_URL') {
-        document.getElementById('activity-table-body').innerHTML = `<tr><td colspan="5" style="text-align:center;color:red;">Please configure SCRIPT_URL in admin.js</td></tr>`;
+        document.getElementById('activity-table-body').innerHTML = `<tr><td colspan="5" style="text-align:center;color:red;">Sila tetapkan SCRIPT_URL dalam admin.js</td></tr>`;
         return;
     }
 
@@ -16,27 +16,27 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.success) {
                 renderDashboard(data.records);
             } else {
-                throw new Error(data.error || "Failed to fetch data.");
+                throw new Error(data.error || "Gagal memuat turun data.");
             }
         } catch (error) {
-            console.error('Error fetching admin data:', error);
-            document.getElementById('activity-table-body').innerHTML = `<tr><td colspan="5" style="text-align:center;">Error loading data. Check console.</td></tr>`;
+            console.error('Ralat semasa mengambil data admin:', error);
+            document.getElementById('activity-table-body').innerHTML = `<tr><td colspan="5" style="text-align:center;">Ralat memuatkan data. Semak konsol.</td></tr>`;
         }
     }
 
     function renderDashboard(records) {
         if (!records || records.length === 0) {
-            document.getElementById('activity-table-body').innerHTML = `<tr><td colspan="5" style="text-align:center;">No records found.</td></tr>`;
+            document.getElementById('activity-table-body').innerHTML = `<tr><td colspan="5" style="text-align:center;">Tiada rekod dijumpai.</td></tr>`;
             document.getElementById('total-today').textContent = '0';
             document.getElementById('last-person').textContent = '--';
             return;
         }
 
         // Get today's count
-        const today = new Date().toDateString();
+        const today = new Date();
+        const todayStr = ('0' + today.getDate()).slice(-2) + '/' + ('0' + (today.getMonth() + 1)).slice(-2) + '/' + String(today.getFullYear()).slice(-2);
         const todayCount = records.filter(record => {
-            const recordDate = new Date(record.timestamp).toDateString();
-            return recordDate === today;
+            return record.timestamp && record.timestamp.startsWith(todayStr); // Check if date part matches
         }).length;
 
         document.getElementById('total-today').textContent = todayCount;
@@ -55,24 +55,13 @@ document.addEventListener('DOMContentLoaded', () => {
         displayRecords.forEach(record => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>${formatTime(record.timestamp)}</td>
+                <td>${record.timestamp}</td>
                 <td><strong>${record.fullName}</strong><div style="font-size:12px;color:var(--text-muted)">${record.phone || ''}</div></td>
                 <td>${record.department}</td>
                 <td>${record.purpose} <br><span style="font-size:12px;color:var(--text-muted)">${record.projectName || ''}</span></td>
                 <td>${record.duration}</td>
             `;
             tbody.appendChild(tr);
-        });
-    }
-
-    function formatTime(isoString) {
-        if (!isoString) return '';
-        const date = new Date(isoString);
-        return date.toLocaleString('en-MY', {
-            day: '2-digit',
-            month: 'short',
-            hour: '2-digit',
-            minute: '2-digit'
         });
     }
 });

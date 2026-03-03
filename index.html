@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-width=1.0, maximum-scale=1.0, user-scalable=no">
@@ -7,102 +8,116 @@
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
 
-<div class="app-container">
-    <header class="app-header">
-        <h1>BDT Store Key Access</h1>
-        <p>Please log your access before taking the key.</p>
-    </header>
+    <div class="app-container">
+        <header class="app-header">
+            <img src="logo.png" alt="BigData Logo" style="max-height: 50px; display: block; margin: 0 auto;">
+            <h2 style="font-size: 18px; color: var(--text-main); margin-top: 5px; text-align: center;">storakses</h2>
+            <p style="margin-top: 10px;">Sila log akses anda sebelum mengambil kunci.</p>
+        </header>
 
-    <div id="success-message" class="alert alert-success hidden">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-        <span>Access Logged Successfully</span>
+        <div id="success-message" class="alert alert-success hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <span>Akses Berjaya Direkodkan</span>
+        </div>
+
+        <div id="warning-message" class="alert alert-warning hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                </path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            <span id="warning-text">Anda telah merekod akses beberapa kali hari ini.</span>
+        </div>
+
+        <form id="access-form" class="main-form">
+
+            <div class="form-group">
+                <label for="fullName">Nama Penuh</label>
+                <input type="text" id="fullName" name="fullName" required placeholder="Masukkan nama penuh anda">
+            </div>
+
+            <div class="form-group">
+                <label for="department">Jabatan / Pasukan</label>
+                <select id="department" name="department" required>
+                    <option value="" disabled selected>Sila pilih</option>
+                    <option value="Pasukan Projek">Pasukan Projek</option>
+                    <option value="Sokongan Teknikal">Sokongan Teknikal</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Pengurusan">Pengurusan</option>
+                    <option value="Helpdesk">Helpdesk</option>
+                    <option value="Lain-lain">Lain-lain</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="purpose">Tujuan Akses</label>
+                <select id="purpose" name="purpose" required>
+                    <option value="" disabled selected>Sila pilih</option>
+                    <option value="Ambil peralatan projek">Ambil peralatan projek</option>
+                    <option value="Pulangkan peralatan">Pulangkan peralatan</option>
+                    <option value="Ambil alat ganti">Ambil alat ganti</option>
+                    <option value="Audit / semakan">Audit / semakan</option>
+                    <option value="Lain-lain">Lain-lain</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="projectName">Nama Projek <span class="optional">(Pilihan)</span></label>
+                <input type="text" id="projectName" name="projectName" placeholder="Cth: RVT, MOE, DOSM">
+            </div>
+
+            <div class="form-group">
+                <label for="duration">Anggaran Tempoh</label>
+                <select id="duration" name="duration" required>
+                    <option value="" disabled selected>Sila pilih</option>
+                    <option value="< 30 minit">&lt; 30 minit</option>
+                    <option value="1 - 2 jam">1 – 2 jam</option>
+                    <option value="> 2 jam">&gt; 2 jam</option>
+                    <option value="Sehingga tamat waktu bekerja">Sehingga tamat waktu bekerja</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Nombor Telefon</label>
+                <input type="tel" id="phone" name="phone" required placeholder="Cth: 0123456789">
+            </div>
+
+            <button type="submit" id="submit-btn" class="btn-primary">
+                <span class="btn-text">Hantar Log</span>
+                <div class="loader hidden" id="submit-loader"></div>
+            </button>
+
+        </form>
+
+        <div class="latest-access-card" id="latest-access-card">
+            <h3>Akses Kunci Terkini</h3>
+            <div class="latest-access-info">
+                <div class="info-row">
+                    <span class="info-label">Pengguna:</span>
+                    <span class="info-value" id="latest-user">Memuatkan...</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Masa:</span>
+                    <span class="info-value" id="latest-time">Memuatkan...</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Tujuan:</span>
+                    <span class="info-value" id="latest-purpose">Memuatkan...</span>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div id="warning-message" class="alert alert-warning hidden">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-        <span id="warning-text">You have logged access multiple times today.</span>
-    </div>
-
-    <form id="access-form" class="main-form">
-        
-        <div class="form-group">
-            <label for="fullName">Full Name</label>
-            <input type="text" id="fullName" name="fullName" required placeholder="Enter your full name">
-        </div>
-
-        <div class="form-group">
-            <label for="department">Department / Team</label>
-            <select id="department" name="department" required>
-                <option value="" disabled selected>Select an option</option>
-                <option value="Project Team">Project Team</option>
-                <option value="Technical Support">Technical Support</option>
-                <option value="Admin">Admin</option>
-                <option value="Management">Management</option>
-                <option value="Others">Others</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="purpose">Purpose of Access</label>
-            <select id="purpose" name="purpose" required>
-                <option value="" disabled selected>Select an option</option>
-                <option value="Take project equipment">Take project equipment</option>
-                <option value="Return equipment">Return equipment</option>
-                <option value="Take spare parts">Take spare parts</option>
-                <option value="Audit / checking">Audit / checking</option>
-                <option value="Others">Others</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="projectName">Project Name <span class="optional">(Optional)</span></label>
-            <input type="text" id="projectName" name="projectName" placeholder="E.g., Phase 1 Deployment">
-        </div>
-
-        <div class="form-group">
-            <label for="duration">Estimated Duration</label>
-            <select id="duration" name="duration" required>
-                <option value="" disabled selected>Select an option</option>
-                <option value="< 30 minutes">&lt; 30 minutes</option>
-                <option value="1 - 2 hours">1 – 2 hours</option>
-                <option value="> 2 hours">&gt; 2 hours</option>
-                <option value="Until end of working day">Until end of working day</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="phone">Phone Number</label>
-            <input type="tel" id="phone" name="phone" required placeholder="E.g., 0123456789">
-        </div>
-
-        <button type="submit" id="submit-btn" class="btn-primary">
-            <span class="btn-text">Submit Log</span>
-            <div class="loader hidden" id="submit-loader"></div>
-        </button>
-
-    </form>
-
-    <div class="latest-access-card" id="latest-access-card">
-        <h3>Latest Key Access</h3>
-        <div class="latest-access-info">
-            <div class="info-row">
-                <span class="info-label">User:</span>
-                <span class="info-value" id="latest-user">Loading...</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Time:</span>
-                <span class="info-value" id="latest-time">Loading...</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Purpose:</span>
-                <span class="info-value" id="latest-purpose">Loading...</span>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script src="app.js"></script>
+    <script src="app.js"></script>
 </body>
+
 </html>

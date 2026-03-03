@@ -13,13 +13,13 @@ function setup() {
     sheet = ss.insertSheet(SHEET_NAME);
     // Setup Headers
     sheet.appendRow([
-      'Timestamp',
-      'Full Name',
-      'Department',
-      'Purpose',
-      'Project Name',
-      'Duration',
-      'Phone'
+      'Masa',
+      'Nama',
+      'Jabatan',
+      'Tujuan',
+      'Nama Projek',
+      'Tempoh',
+      'Nombor Telefon'
     ]);
     sheet.getRange("A1:G1").setFontWeight("bold");
     sheet.setFrozenRows(1);
@@ -37,7 +37,7 @@ function doPost(e) {
       sheet = ss.getSheetByName(SHEET_NAME);
     }
     
-    const timestamp = new Date().toISOString();
+    const timestamp = Utilities.formatDate(new Date(), "Asia/Kuala_Lumpur", "dd/MM/yy | hh:mm a").toLowerCase();
     const fullName = data.fullName || '';
     
     // Append to sheet
@@ -52,16 +52,17 @@ function doPost(e) {
     ]);
 
     // Check how many times this user accessed today
-    const todayStr = new Date().toDateString();
+    const todayStr = Utilities.formatDate(new Date(), "Asia/Kuala_Lumpur", "dd/MM/yy");
     const allData = sheet.getDataRange().getValues();
     let userAccessCount = 0;
     
     // Skip header row (1)
     for (let i = 1; i < allData.length; i++) {
-        const rowTimestamp = new Date(allData[i][0]);
-        const rowName = allData[i][1];
+        const rowTimestampStr = String(allData[i][0]);
+        const rowDateStr = rowTimestampStr.split(" | ")[0];
+        const rowName = String(allData[i][1]);
         
-        if (rowTimestamp.toDateString() === todayStr && rowName.toLowerCase() === fullName.toLowerCase()) {
+        if (rowDateStr === todayStr && rowName.toLowerCase() === fullName.toLowerCase()) {
             userAccessCount++;
         }
     }
@@ -69,7 +70,7 @@ function doPost(e) {
     return ContentService
       .createTextOutput(JSON.stringify({ 
         success: true, 
-        message: 'Log added successfully', 
+        message: 'Log berjaya ditambah', 
         userAccessCount: userAccessCount 
       }))
       .setMimeType(ContentService.MimeType.JSON);
@@ -88,7 +89,7 @@ function doGet(e) {
     
     if (!sheet) {
       return ContentService
-        .createTextOutput(JSON.stringify({ success: false, error: "Sheet not initialized" }))
+        .createTextOutput(JSON.stringify({ success: false, error: "Sila set up helaian dahulu" }))
         .setMimeType(ContentService.MimeType.JSON);
     }
     
@@ -124,7 +125,7 @@ function doGet(e) {
     }
     else {
       return ContentService
-        .createTextOutput(JSON.stringify({ success: false, error: "Invalid action" }))
+        .createTextOutput(JSON.stringify({ success: false, error: "Arahan tidak sah" }))
         .setMimeType(ContentService.MimeType.JSON);
     }
     

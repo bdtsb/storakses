@@ -1,23 +1,23 @@
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzPwXGyR0aDSj1tOI6j12tnDBVjc7TjwSbrUmVrDvBBcd0niEqkoI3ENMTnfskGhgFs/exec'; // E.g., https://script.google.com/macros/s/.../exec
 
 document.addEventListener('DOMContentLoaded', () => {
-    
+
     const form = document.getElementById('access-form');
     const submitBtn = document.getElementById('submit-btn');
     const btnText = submitBtn.querySelector('.btn-text');
     const loader = document.getElementById('submit-loader');
-    
+
     const successMessage = document.getElementById('success-message');
     const warningMessage = document.getElementById('warning-message');
-    
+
     // Fetch latest access on load
     fetchLatestAccess();
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         if (SCRIPT_URL === 'REPLACE_WITH_YOUR_WEB_APP_URL') {
-            alert("Please configure the Google Apps Script URL in app.js first.");
+            alert("Sila tetapkan Google Apps Script URL dalam app.js terlebih dahulu.");
             return;
         }
 
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Using text/plain is a common workaround to avoid CORS preflight issues with typical Google Apps Script setups when sending JSON stringified
                 body: JSON.stringify(data),
                 headers: {
-                    'Content-Type': 'text/plain;charset=utf-8' 
+                    'Content-Type': 'text/plain;charset=utf-8'
                 }
             });
 
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (result.success) {
                 // Show success
                 successMessage.classList.remove('hidden');
-                
+
                 // Show warning if accesses > 3
                 if (result.userAccessCount && result.userAccessCount > 3) {
                     warningMessage.classList.remove('hidden');
@@ -56,21 +56,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 form.reset();
                 // Update latest access view
                 fetchLatestAccess();
-                
+
                 // Scroll to top to see success
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                
+
                 // Hide success message after 5 seconds
                 setTimeout(() => {
                     successMessage.classList.add('hidden');
                     warningMessage.classList.add('hidden');
                 }, 5000);
             } else {
-                throw new Error(result.error || "Failed to submit log.");
+                throw new Error(result.error || "Gagal menghantar log.");
             }
         } catch (error) {
-            console.error('Error submitting form:', error);
-            alert("An error occurred while submitting. Please try again or check your connection.");
+            console.error('Ralat semasa menghantar borang:', error);
+            alert("Ralat berlaku semasa menghantar. Sila cuba lagi atau semak sambungan anda.");
         } finally {
             setLoadingState(false);
         }
@@ -82,16 +82,16 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch(`${SCRIPT_URL}?action=getLatest`);
             const data = await response.json();
-            
+
             if (data.success && data.record) {
                 document.getElementById('latest-user').textContent = data.record.fullName || 'N/A';
-                document.getElementById('latest-time').textContent = data.record.timestamp ? formatTime(data.record.timestamp) : 'N/A';
+                document.getElementById('latest-time').textContent = data.record.timestamp || 'N/A';
                 document.getElementById('latest-purpose').textContent = data.record.purpose || 'N/A';
             } else {
                 setLatestAccessError();
             }
         } catch (error) {
-            console.error('Error fetching latest access:', error);
+            console.error('Ralat semasa memuat turun rekod terkini:', error);
             setLatestAccessError();
         }
     }
@@ -111,16 +111,5 @@ document.addEventListener('DOMContentLoaded', () => {
             btnText.classList.remove('hidden');
             loader.classList.add('hidden');
         }
-    }
-
-    function formatTime(isoString) {
-        const date = new Date(isoString);
-        return date.toLocaleString('en-MY', {
-            day: '2-digit',
-            month: 'short',
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-        });
     }
 });
