@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Get today's count
         const today = new Date();
-        const todayStr = ('0' + today.getDate()).slice(-2) + '/' + ('0' + (today.getMonth() + 1)).slice(-2) + '/' + String(today.getFullYear()).slice(-2);
+        const todayStr = ('0' + today.getDate()).slice(-2) + '/' + ('0' + (today.getMonth() + 1)).slice(-2) + '/' + String(today.getFullYear());
         const todayCount = records.filter(record => {
             return record.timestamp && record.timestamp.startsWith(todayStr); // Check if date part matches
         }).length;

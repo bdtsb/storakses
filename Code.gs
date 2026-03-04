@@ -24,6 +24,13 @@ function setup() {
     sheet.getRange("A1:G1").setFontWeight("bold");
     sheet.setFrozenRows(1);
   }
+  
+  let staffSheet = ss.getSheetByName("STAFF_LIST");
+  if (!staffSheet) {
+    staffSheet = ss.insertSheet("STAFF_LIST");
+    staffSheet.appendRow(["Staff_Name", "PIN"]);
+    staffSheet.getRange("A1:B1").setFontWeight("bold").setBackground("#fff2cc");
+  }
 }
 
 function doPost(e) {
@@ -37,8 +44,39 @@ function doPost(e) {
       sheet = ss.getSheetByName(SHEET_NAME);
     }
     
-    const timestamp = Utilities.formatDate(new Date(), "Asia/Kuala_Lumpur", "dd/MM/yy | hh:mm a").toLowerCase();
+    // Check if it's the PIN setup action
+    if (data.action === "setStaffPin") {
+      return setStaffPin(data.payload);
+    }
+    
+    const timestamp = Utilities.formatDate(new Date(), "Asia/Kuala_Lumpur", "dd/MM/yyyy hh:mm a").toLowerCase();
     const fullName = data.fullName || '';
+    const pinInput = data.pin || '';
+    
+    // --- PIN VERIFICATION ---
+    const staffSheet = ss.getSheetByName("STAFF_LIST");
+    if (!staffSheet) {
+      setup(); 
+    }
+    const staffData = ss.getSheetByName("STAFF_LIST").getDataRange().getValues();
+    let isAuthorized = false;
+    
+    for (let s = 1; s < staffData.length; s++) {
+      if (String(staffData[s][0]).trim().toLowerCase() === fullName.toLowerCase()) {
+        const realPin = String(staffData[s][1]).trim();
+        if (realPin !== "" && realPin === pinInput) {
+          isAuthorized = true;
+        }
+        break;
+      }
+    }
+    
+    if (!isAuthorized) {
+       return ContentService
+        .createTextOutput(JSON.stringify({ success: false, error: "Pengesahan Gagal: PIN tidak sah bagi nama " + fullName }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    // ------------------------
     
     // Append to sheet
     sheet.appendRow([
@@ -52,14 +90,15 @@ function doPost(e) {
     ]);
 
     // Check how many times this user accessed today
-    const todayStr = Utilities.formatDate(new Date(), "Asia/Kuala_Lumpur", "dd/MM/yy");
+    const todayStr = Utilities.formatDate(new Date(), "Asia/Kuala_Lumpur", "dd/MM/yyyy");
     const allData = sheet.getDataRange().getValues();
     let userAccessCount = 0;
     
     // Skip header row (1)
     for (let i = 1; i < allData.length; i++) {
         const rowTimestampStr = String(allData[i][0]);
-        const rowDateStr = rowTimestampStr.split(" | ")[0];
+        // Extract just the dd/MM/yyyy part (first 10 characters)
+        const rowDateStr = rowTimestampStr.substring(0, 10);
         const rowName = String(allData[i][1]);
         
         if (rowDateStr === todayStr && rowName.toLowerCase() === fullName.toLowerCase()) {
@@ -123,6 +162,11 @@ function doGet(e) {
         .createTextOutput(JSON.stringify({ success: true, records: records }))
         .setMimeType(ContentService.MimeType.JSON);
     }
+    else if (action === 'getStaff') {
+      return ContentService
+        .createTextOutput(JSON.stringify({ success: true, data: getStaff() }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
     else {
       return ContentService
         .createTextOutput(JSON.stringify({ success: false, error: "Arahan tidak sah" }))
@@ -133,5 +177,59 @@ function doGet(e) {
     return ContentService
       .createTextOutput(JSON.stringify({ success: false, error: error.toString() }))
       .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function getStaff() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName("STAFF_LIST");
+  if (!sheet) {
+    setup();
+    sheet = ss.getSheetByName("STAFF_LIST");
+  }
+  const data = sheet.getDataRange().getValues();
+  const staffList = [];
+  
+  for (let i = 1; i < data.length; i++) {
+    const name = String(data[i][0] || "").trim();
+    if (name !== "") {
+      const pin = String(data[i][1] || "").trim();
+      staffList.push({
+        Staff_Name: name,
+        Has_PIN: pin !== ""
+      });
+    }
+  }
+  return staffList;
+}
+
+function setStaffPin(payload) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheetByName("STAFF_LIST");
+    const sheetData = sheet.getDataRange().getValues();
+    
+    const staffName = (payload.Staff_Name || "").trim();
+    const newPin = (payload.PIN || "").trim();
+    
+    if (!staffName || !newPin) {
+      return ContentService.createTextOutput(JSON.stringify({success: false, error: "Maklumat tidak lengkap."})).setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    for (let i = 1; i < sheetData.length; i++) {
+      if (String(sheetData[i][0]).trim().toLowerCase() === staffName.toLowerCase()) {
+        const existingPin = String(sheetData[i][1]).trim();
+        if (existingPin !== "") {
+           return ContentService.createTextOutput(JSON.stringify({success: false, error: "Staff ini sudah mempunyai PIN."})).setMimeType(ContentService.MimeType.JSON);
+        }
+        
+        // Update PIN
+        sheet.getRange(i + 1, 2).setValue(newPin);
+        return ContentService.createTextOutput(JSON.stringify({success: true, message: "PIN berjaya ditetapkan."})).setMimeType(ContentService.MimeType.JSON);
+      }
+    }
+    return ContentService.createTextOutput(JSON.stringify({success: false, error: "Nama Staff tidak dijumpai."})).setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({success: false, error: err.toString()})).setMimeType(ContentService.MimeType.JSON);
   }
 }

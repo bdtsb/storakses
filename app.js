@@ -1,5 +1,7 @@
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzPwXGyR0aDSj1tOI6j12tnDBVjc7TjwSbrUmVrDvBBcd0niEqkoI3ENMTnfskGhgFs/exec'; // E.g., https://script.google.com/macros/s/.../exec
 
+let staffList = [];
+let pendingTransactionPayload = null;
 document.addEventListener('DOMContentLoaded', () => {
 
     const form = document.getElementById('access-form');
@@ -12,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Fetch latest access on load
     fetchLatestAccess();
+    fetchStaff();
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -27,7 +30,33 @@ document.addEventListener('DOMContentLoaded', () => {
         data.action = 'addLog';
         data.timestamp = new Date().toISOString(); // Sent for logging purposes locally, Apps Script will use server time
 
-        // UI Feedback
+        const staffName = data.fullName;
+        if (!staffName) {
+            return alert('Sila pilih nama Staff!');
+        }
+
+        const staffObj = staffList.find(s => s.Staff_Name === staffName);
+        if (!staffObj) {
+            return alert('Sila hubungi Admin untuk daftarkan nama anda dalam STAFF_LIST.');
+        }
+
+        pendingTransactionPayload = data;
+
+        // Check PIN status
+        if (!staffObj.Has_PIN) {
+            document.getElementById('staff-set-pin-modal').classList.remove('hidden');
+            document.getElementById('staff-new-pin').value = '';
+            document.getElementById('staff-confirm-pin').value = '';
+            setTimeout(() => document.getElementById('staff-new-pin').focus(), 100);
+        } else {
+            document.getElementById('staff-verify-pin-modal').classList.remove('hidden');
+            document.getElementById('staff-verify-pin').value = '';
+            setTimeout(() => document.getElementById('staff-verify-pin').focus(), 100);
+        }
+    });
+
+    window.executePendingTransaction = async function () {
+        if (!pendingTransactionPayload) return;
         setLoadingState(true);
         successMessage.classList.add('hidden');
         warningMessage.classList.add('hidden');
@@ -35,8 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch(SCRIPT_URL, {
                 method: 'POST',
-                // Using text/plain is a common workaround to avoid CORS preflight issues with typical Google Apps Script setups when sending JSON stringified
-                body: JSON.stringify(data),
+                body: JSON.stringify(pendingTransactionPayload),
                 headers: {
                     'Content-Type': 'text/plain;charset=utf-8'
                 }
@@ -70,11 +98,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error('Ralat semasa menghantar borang:', error);
-            alert("Ralat berlaku semasa menghantar. Sila cuba lagi atau semak sambungan anda.");
+            alert("Ralat berlaku semasa menghantar: " + (error.message || "Sila cuba lagi."));
         } finally {
             setLoadingState(false);
+            pendingTransactionPayload = null;
         }
-    });
+    }
 
     async function fetchLatestAccess() {
         if (SCRIPT_URL === 'REPLACE_WITH_YOUR_WEB_APP_URL') return;
@@ -111,5 +140,72 @@ document.addEventListener('DOMContentLoaded', () => {
             btnText.classList.remove('hidden');
             loader.classList.add('hidden');
         }
+    }
+
+    async function fetchStaff() {
+        if (SCRIPT_URL === 'REPLACE_WITH_YOUR_WEB_APP_URL') return;
+        try {
+            const response = await fetch(`${SCRIPT_URL}?action=getStaff`);
+            const data = await response.json();
+            if (data.success) {
+                staffList = data.data;
+                const options = `<option value="" disabled selected>Sila pilih</option>` +
+                    staffList.map(s => `<option value="${s.Staff_Name}">${s.Staff_Name}</option>`).join('');
+                document.getElementById('fullName').innerHTML = options;
+            }
+        } catch (error) {
+            console.error("Error loading staff", error);
+        }
+    }
+
+    // --- Staff PIN Modals Logic ---
+    window.closeStaffModal = function (type) {
+        if (type === 'set') document.getElementById('staff-set-pin-modal').classList.add('hidden');
+        if (type === 'verify') document.getElementById('staff-verify-pin-modal').classList.add('hidden');
+        pendingTransactionPayload = null;
+    }
+
+    window.submitSetStaffPin = async function () {
+        const pin1 = document.getElementById('staff-new-pin').value;
+        const pin2 = document.getElementById('staff-confirm-pin').value;
+
+        if (pin1.length !== 4 || isNaN(pin1)) return alert('PIN mestilah 4 angka.');
+        if (pin1 !== pin2) return alert('Ralat: PIN pengesahan tidak sepadan!');
+
+        setLoadingState(true);
+        try {
+            const res = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: "setStaffPin",
+                    payload: { Staff_Name: pendingTransactionPayload.fullName, PIN: pin1 }
+                }),
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+            });
+            const data = await res.json();
+            if (data.success) {
+                const staffObj = staffList.find(s => s.Staff_Name === pendingTransactionPayload.fullName);
+                if (staffObj) staffObj.Has_PIN = true;
+
+                document.getElementById('staff-set-pin-modal').classList.add('hidden');
+                pendingTransactionPayload.pin = pin1;
+                executePendingTransaction();
+            } else {
+                alert(data.error);
+                setLoadingState(false);
+            }
+        } catch (e) {
+            alert('Ralat sambungan.');
+            setLoadingState(false);
+        }
+    }
+
+    window.submitVerifyStaffPin = function () {
+        const pin = document.getElementById('staff-verify-pin').value;
+        if (pin.length !== 4) return alert('Sila masukkan 4-digit PIN.');
+
+        document.getElementById('staff-verify-pin-modal').classList.add('hidden');
+        pendingTransactionPayload.pin = pin;
+        executePendingTransaction();
     }
 });

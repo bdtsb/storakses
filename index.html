@@ -41,7 +41,9 @@
 
             <div class="form-group">
                 <label for="fullName">Nama Penuh</label>
-                <input type="text" id="fullName" name="fullName" required placeholder="Masukkan nama penuh anda">
+                <select id="fullName" name="fullName" required>
+                    <option value="" disabled selected>Loading Staff...</option>
+                </select>
             </div>
 
             <div class="form-group">
@@ -112,6 +114,49 @@
                     <span class="info-label">Tujuan:</span>
                     <span class="info-value" id="latest-purpose">Memuatkan...</span>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Set Staff PIN Modal -->
+    <div class="modal-overlay hidden" id="staff-set-pin-modal">
+        <div class="modal-content">
+            <h3 class="modal-title">Cipta PIN Pertama Kali</h3>
+            <p style="margin-bottom: 1rem; color: #666;">Sila tetapkan 4-digit PIN keselamatan untuk nama anda.</p>
+            <div class="form-group">
+                <input type="password" id="staff-new-pin" maxlength="4" placeholder="****"
+                    style="text-align: center; font-size: 1.5rem; letter-spacing: 0.5rem; width: 100%;">
+            </div>
+            <div class="form-group">
+                <label>Sahkan PIN Baru</label>
+                <input type="password" id="staff-confirm-pin" maxlength="4" placeholder="****"
+                    style="text-align: center; font-size: 1.5rem; letter-spacing: 0.5rem; width: 100%;"
+                    onkeypress="if(event.key === 'Enter') submitSetStaffPin()">
+            </div>
+            <div class="modal-actions" style="display: flex; gap: 10px; margin-top: 20px;">
+                <button type="button" class="btn-primary" style="background: #e74c3c;"
+                    onclick="closeStaffModal('set')">Batal</button>
+                <button type="button" class="btn-primary" style="margin-top: 0;" onclick="submitSetStaffPin()">Simpan
+                    PIN</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Verify Staff PIN Modal -->
+    <div class="modal-overlay hidden" id="staff-verify-pin-modal">
+        <div class="modal-content">
+            <h3 class="modal-title">Pengesahan Kakitangan</h3>
+            <p style="margin-bottom: 1rem; color: #666;">Sila masukkan 4-digit PIN keselamatan anda.</p>
+            <div class="form-group">
+                <input type="password" id="staff-verify-pin" maxlength="4" placeholder="****"
+                    style="text-align: center; font-size: 1.5rem; letter-spacing: 0.5rem; width: 100%;"
+                    onkeypress="if(event.key === 'Enter') submitVerifyStaffPin()">
+            </div>
+            <div class="modal-actions" style="display: flex; gap: 10px; margin-top: 20px;">
+                <button type="button" class="btn-primary" style="background: #e74c3c;"
+                    onclick="closeStaffModal('verify')">Batal</button>
+                <button type="button" class="btn-primary" style="margin-top: 0;"
+                    onclick="submitVerifyStaffPin()">Sahkan</button>
             </div>
         </div>
     </div>
