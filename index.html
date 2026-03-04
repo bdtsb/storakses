@@ -46,35 +46,15 @@
                 </select>
             </div>
 
-            <div class="form-group">
-                <label for="department">Jabatan / Pasukan</label>
-                <select id="department" name="department" required>
-                    <option value="" disabled selected>Sila pilih</option>
-                    <option value="Pasukan Projek">Pasukan Projek</option>
-                    <option value="Sokongan Teknikal">Sokongan Teknikal</option>
-                    <option value="Admin">Admin</option>
-                    <option value="Pengurusan">Pengurusan</option>
-                    <option value="Helpdesk">Helpdesk</option>
-                    <option value="Lain-lain">Lain-lain</option>
-                </select>
-            </div>
+
 
             <div class="form-group">
                 <label for="purpose">Tujuan Akses</label>
-                <select id="purpose" name="purpose" required>
-                    <option value="" disabled selected>Sila pilih</option>
-                    <option value="Ambil peralatan projek">Ambil peralatan projek</option>
-                    <option value="Pulangkan peralatan">Pulangkan peralatan</option>
-                    <option value="Ambil alat ganti">Ambil alat ganti</option>
-                    <option value="Audit / semakan">Audit / semakan</option>
-                    <option value="Lain-lain">Lain-lain</option>
-                </select>
+                <input type="text" id="purpose" name="purpose" required
+                    placeholder="Cth: Ambil barang projek, Ambil alat ganti">
             </div>
 
-            <div class="form-group">
-                <label for="projectName">Nama Projek <span class="optional">(Pilihan)</span></label>
-                <input type="text" id="projectName" name="projectName" placeholder="Cth: RVT, MOE, DOSM">
-            </div>
+
 
             <div class="form-group">
                 <label for="duration">Anggaran Tempoh</label>
@@ -87,10 +67,7 @@
                 </select>
             </div>
 
-            <div class="form-group">
-                <label for="phone">Nombor Telefon</label>
-                <input type="tel" id="phone" name="phone" required placeholder="Cth: 0123456789">
-            </div>
+
 
             <button type="submit" id="submit-btn" class="btn-primary">
                 <span class="btn-text">Hantar Log</span>
