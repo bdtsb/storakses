@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (data.success && data.record) {
                 document.getElementById('latest-user').textContent = data.record.fullName || 'N/A';
-                document.getElementById('latest-time').textContent = data.record.timestamp || 'N/A';
+                document.getElementById('latest-time').textContent = formatTimestamp(data.record.timestamp) || 'N/A';
                 document.getElementById('latest-purpose').textContent = data.record.purpose || 'N/A';
             } else {
                 setLatestAccessError();
@@ -140,6 +140,18 @@ document.addEventListener('DOMContentLoaded', () => {
             btnText.classList.remove('hidden');
             loader.classList.add('hidden');
         }
+    }
+
+    function formatTimestamp(isoString) {
+        if (!isoString) return '-';
+        if (String(isoString).includes('T')) {
+            const d = new Date(isoString);
+            if (!isNaN(d.getTime())) {
+                const pad = n => String(n).padStart(2, '0');
+                return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${String(d.getFullYear()).slice(-2)} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+            }
+        }
+        return isoString;
     }
 
     async function fetchStaff() {
@@ -189,23 +201,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 document.getElementById('staff-set-pin-modal').classList.add('hidden');
                 pendingTransactionPayload.pin = pin1;
-                executePendingTransaction();
+                await executePendingTransaction();
             } else {
-                alert(data.error);
+                alert("❌ Ralat Pelayan: " + data.error);
                 setLoadingState(false);
             }
         } catch (e) {
-            alert('Ralat sambungan.');
+            alert('❌ Ralat sambungan. Sila semak internet anda.');
             setLoadingState(false);
         }
     }
 
-    window.submitVerifyStaffPin = function () {
+    window.submitVerifyStaffPin = async function () {
         const pin = document.getElementById('staff-verify-pin').value;
         if (pin.length !== 4) return alert('Sila masukkan 4-digit PIN.');
 
         document.getElementById('staff-verify-pin-modal').classList.add('hidden');
         pendingTransactionPayload.pin = pin;
-        executePendingTransaction();
+        await executePendingTransaction();
     }
 });

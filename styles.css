@@ -83,7 +83,8 @@ input[type="tel"],
 select {
     width: 100%;
     padding: 12px 14px;
-    font-size: 16px; /* Prevents iOS zoom */
+    font-size: 16px;
+    /* Prevents iOS zoom */
     font-family: var(--font-family);
     border: 1px solid var(--border-color);
     border-radius: 8px;
@@ -113,7 +114,8 @@ input[type="tel"]::placeholder {
 }
 
 /* Remove dropdown arrow from regular inputs */
-input[type="text"], input[type="tel"] {
+input[type="text"],
+input[type="tel"] {
     background-image: none;
 }
 
@@ -135,7 +137,8 @@ input[type="text"], input[type="tel"] {
     box-shadow: 0 2px 4px rgba(0, 86, 179, 0.2);
 }
 
-.btn-primary:hover, .btn-primary:active {
+.btn-primary:hover,
+.btn-primary:active {
     background-color: var(--primary-hover);
 }
 
@@ -183,7 +186,9 @@ input[type="text"], input[type="tel"] {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .latest-access-card {
@@ -229,4 +234,63 @@ input[type="text"], input[type="tel"] {
     text-align: right;
     word-break: break-word;
     max-width: 70%;
+}
+
+/* Modals */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    /* Changed from none to flex */
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.modal-overlay.hidden {
+    display: none !important;
+}
+
+.modal-content {
+    background: var(--card-bg);
+    width: 90%;
+    max-width: 400px;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.modal-actions button {
+    flex: 1;
 }
