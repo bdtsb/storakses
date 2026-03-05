@@ -15,13 +15,10 @@ function setup() {
     sheet.appendRow([
       'Masa',
       'Nama',
-      'Jabatan',
       'Tujuan',
-      'Nama Projek',
-      'Tempoh',
-      'Nombor Telefon'
+      'Tempoh'
     ]);
-    sheet.getRange("A1:G1").setFontWeight("bold");
+    sheet.getRange("A1:D1").setFontWeight("bold");
     sheet.setFrozenRows(1);
   }
   
@@ -49,7 +46,7 @@ function doPost(e) {
       return setStaffPin(data.payload);
     }
     
-    const timestamp = Utilities.formatDate(new Date(), "Asia/Kuala_Lumpur", "dd/MM/yyyy hh:mm a").toLowerCase();
+    const timestamp = Utilities.formatDate(new Date(), "Asia/Kuala_Lumpur", "dd/MM/yy HH:mm");
     const fullName = data.fullName || '';
     const pinInput = data.pin || '';
     
@@ -82,11 +79,8 @@ function doPost(e) {
     sheet.appendRow([
       timestamp,
       fullName,
-      data.department || '',
       data.purpose || '',
-      data.projectName || '',
-      data.duration || '',
-      data.phone || ''
+      data.duration || ''
     ]);
 
     // Check how many times this user accessed today
@@ -143,11 +137,8 @@ function doGet(e) {
       return {
         timestamp: row[0],
         fullName: row[1],
-        department: row[2],
-        purpose: row[3],
-        projectName: row[4],
-        duration: row[5],
-        phone: row[6]
+        purpose: row[2],
+        duration: row[3]
       };
     });
 
